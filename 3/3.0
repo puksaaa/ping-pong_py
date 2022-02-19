@@ -1,0 +1,103 @@
+from pygame import *
+
+class GameSprite(sprite.Sprite):
+    def __init__(self, player_image, player_x, player_y, size_x, size_y, player_speed):
+        super().__init__()
+        self.image = transform.scale(image.load(player_image), (size_x, size_y))
+        self.speed = player_speed
+        self.rect = self.image.get_rect()
+        self.rect.x = player_x
+        self.rect.y = player_y
+
+    def reset(self):
+        window.blit(self.image, (self.rect.x, self.rect.y))
+
+
+class Player1(GameSprite):
+    def update(self):
+        keys_pressed = key.get_pressed()
+
+        if keys_pressed[K_UP] and self.rect.y > 5:
+            self.rect.y -= 5
+
+        if keys_pressed[K_DOWN] and self.rect.y < 425:
+            self.rect.y += 5
+
+
+
+class Player2(GameSprite):
+    def update(self):
+        keys_pressed = key.get_pressed()
+
+        if keys_pressed[K_w] and self.rect.y > 5:
+            self.rect.y -= 5
+
+        if keys_pressed[K_s] and self.rect.y < 425:
+            self.rect.y += 5
+
+
+
+
+
+
+window = display.set_mode((1000, 700))
+display.set_caption("пинг-понг")
+
+#спрайты
+fon = transform.scale(image.load("fon.jpg"), (1000, 700))
+
+k = Player2('kokich.png', 30, 30, 80, 200, 10)
+m = Player1('miu.png', 870, 30, 80, 200, 10)
+
+b = GameSprite('mys.png', 420, 270, 80, 80, 5)
+
+font.init()
+font1 =  font.SysFont('impact', 80)
+
+bx = 3
+by = 4 
+
+finish = False
+clock = time.Clock()
+game = True
+while game != False:
+    for e in event.get():
+        if e.type == QUIT:
+            game = False
+
+
+    if finish != True:
+
+        window.blit(fon, (0,0))
+        k.reset()
+        m.reset()
+
+        m.update()
+        k.update()
+
+        b.reset()
+
+        b.rect.x += bx
+        b.rect.y += by
+
+        if b.rect.y > 620 or b.rect.y < 0:
+            by *= -1
+
+        if sprite.collide_rect(b, m) or sprite.collide_rect(b, k):
+            bx *= -1
+
+
+        if b.rect.x < 0:
+            finish = True
+            text_m = font1.render('МИУ ВЫИГРАЛА!!!!!!!!!!',1, (255, 255, 255))
+            window.blit(text_m, (200, 350))
+            
+
+        if  b.rect.x > 930:
+            finish = True
+            text_k = font1.render('КОКИЧ  ВЫИГРАЛ!!!!!!!!!',1, (255, 255, 255))
+            window.blit(text_k, (200, 350))
+
+    clock.tick(60)
+
+    display.update() 
